@@ -38,11 +38,12 @@ python3 -m venv venv
 source venv/bin/activate
 
 cat <<EOF > requirements.txt
-flask
-gdown==4.7.1
-yt-dlp==2024.04.09
-requests
-certifi
+flask==2.0.1
+werkzeug==2.0.3
+gdown==4.4.0
+yt-dlp==2023.7.6
+requests>=2.26.0
+certifi>=2022.12.7
 EOF
 
 pip install --upgrade pip
