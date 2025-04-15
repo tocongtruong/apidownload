@@ -23,6 +23,7 @@ echo "✅ Domain hợp lệ. Bắt đầu cài đặt..."
 
 # Cài gói cần thiết
 apt update
+apt upgrade
 apt install -y curl python3 python3-pip python3-venv nginx certbot python3-certbot-nginx
 
 # Tạo thư mục app
@@ -38,12 +39,13 @@ python3 -m venv venv
 source venv/bin/activate
 
 cat <<EOF > requirements.txt
-flask==2.0.1
 werkzeug==2.0.3
-gdown==4.4.0
-yt-dlp==2023.7.6
-requests>=2.26.0
-certifi>=2022.12.7
+Flask==3.0.3
+gdown==5.2.0
+yt-dlp==2024.10.22
+requests==2.32.3
+certifi==2024.8.30
+urllib3==2.2.3
 EOF
 
 pip install --upgrade pip
@@ -93,6 +95,18 @@ nginx -t && systemctl reload nginx
 # SSL certbot
 echo "🔐 Cấp chứng chỉ SSL Let's Encrypt"
 certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m admin@$DOMAIN
+
+# Thiết lập tự động gia hạn SSL bằng cron
+echo "🔁 Đảm bảo cron job tự động gia hạn SSL tồn tại..."
+CRON_JOB="0 3 * * * certbot renew --quiet --deploy-hook \"systemctl reload nginx\""
+
+# Chỉ thêm nếu chưa có
+if ! crontab -l 2>/dev/null | grep -Fq "certbot renew"; then
+    (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
+    echo "✅ Đã thêm cron job tự động gia hạn SSL vào crontab"
+else
+    echo "✅ Cron job đã tồn tại, không cần thêm lại"
+fi
 
 echo ""
 echo "✅ Hoàn tất! API Flask đang chạy tại: https://$DOMAIN"
