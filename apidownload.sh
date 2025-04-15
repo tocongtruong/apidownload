@@ -39,7 +39,6 @@ python3 -m venv venv
 source venv/bin/activate
 
 cat <<EOF > requirements.txt
-werkzeug==2.0.3
 Flask==3.0.3
 gdown==5.2.0
 yt-dlp==2024.10.22
